@@ -1,0 +1,14 @@
+name: gifty-indexer
+description: Indexer for Gifty EphemeralNotes on Circle Arc Testnet
+networks:
+- id: 5042002
+  rpc_config:
+    url: https://rpc.testnet.arc.network
+  start_block: 0 # To be updated with actual deployment block
+  contracts:
+  - name: EphemeralNotes
+    address: # To be filled after deployment
+    handler: src/EventHandlers.ts
+    events:
+    - event: NoteCreated(tuple(address ephemeralOwner, address sender, uint256 amount) note)
+    - event: NoteRedeemed(tuple(address ephemeralOwner, address sender, uint256 amount) note, address redeemer)

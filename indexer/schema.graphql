@@ -1,0 +1,9 @@
+type Note @entity {
+  id: ID! # ephemeralOwner address
+  sender: String!
+  amount: BigInt!
+  isRedeemed: Boolean!
+  redeemer: String
+  createdAtTimestamp: Int!
+  redeemedAtTimestamp: Int
+}
