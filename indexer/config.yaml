@@ -7,7 +7,7 @@ networks:
   start_block: 0 # To be updated with actual deployment block
   contracts:
   - name: EphemeralNotes
-    address: # To be filled after deployment
+    address: 0xd8D86eCc3d2EFb0939611926c80DC8917440d776
     handler: src/EventHandlers.ts
     events:
     - event: NoteCreated(tuple(address ephemeralOwner, address sender, uint256 amount) note)

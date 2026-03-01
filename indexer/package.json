@@ -1,0 +1,10 @@
+{
+    "name": "gifty-indexer",
+    "version": "1.0.0",
+    "scripts": {
+        "codegen": "envio codegen"
+    },
+    "dependencies": {
+        "envio": "^2.32.3"
+    }
+}

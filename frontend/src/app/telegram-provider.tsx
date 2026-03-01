@@ -1,18 +1,26 @@
 'use client'
 
-import { WebAppProvider } from '@telegram-apps/sdk-react'
+import { useEffect } from 'react'
+import { init } from '@telegram-apps/sdk'
+
+declare global {
+    interface Window {
+        TelegramWebviewProxy: any;
+    }
+}
 
 export function TelegramProvider({ children }: { children: React.ReactNode }) {
-    // Use a mock provider for local development outside the Telegram app
     const isDevelopment = process.env.NODE_ENV === 'development'
 
-    if (isDevelopment && typeof window !== 'undefined' && !window.TelegramWebviewProxy) {
-        return <>{children}</>
-    }
+    useEffect(() => {
+        if (!isDevelopment && typeof window !== 'undefined' && window.TelegramWebviewProxy) {
+            try {
+                init()
+            } catch (e) {
+                console.error("Telegram SDK init failed", e)
+            }
+        }
+    }, [isDevelopment])
 
-    return (
-        <WebAppProvider options={{ acceptCustomStyles: true }}>
-            {children}
-        </WebAppProvider>
-    )
+    return <>{children}</>
 }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { EphemeralNotes } from "generated";
 
 EphemeralNotes.NoteCreated.handler(async ({ event, context }) => {

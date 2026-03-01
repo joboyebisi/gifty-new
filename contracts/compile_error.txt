@@ -1,0 +1,10 @@
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+Compiling EphemeralNotes.sol...
+ParserError: Source file requires different compiler version (current compiler is 0.8.20+commit.a1b79de6.Emscripten.clang) - note that nightly builds are considered to be strictly less than the released version
+ --> @openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol:4:1:
+  |
+4 | pragma solidity ^0.8.24;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+Compilation failed.
