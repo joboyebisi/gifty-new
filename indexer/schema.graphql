@@ -1,9 +1,26 @@
-type Note @entity {
-  id: ID! # ephemeralOwner address
-  sender: String!
+type FractionalProperty_PropertyListed @entity {
+  id: ID!
+  propertyId: BigInt!
+  pricePerShare: BigInt!
+}
+
+type FractionalProperty_SharesPurchased @entity {
+  id: ID!
+  propertyId: BigInt!
+  buyer: String!
   amount: BigInt!
-  isRedeemed: Boolean!
-  redeemer: String
-  createdAtTimestamp: Int!
-  redeemedAtTimestamp: Int
+}
+
+type SavingsVault_Saved @entity {
+  id: ID!
+  user: String!
+  propertyId: BigInt!
+  amount: BigInt!
+}
+
+type SavingsVault_Withdrawn @entity {
+  id: ID!
+  user: String!
+  propertyId: BigInt!
+  amount: BigInt!
 }

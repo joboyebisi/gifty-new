@@ -1,14 +1,20 @@
 name: gifty-indexer
-description: Indexer for Gifty EphemeralNotes on Circle Arc Testnet
+description: Indexer for Gifty Agentic Real Estate on Circle Arc Testnet
 networks:
 - id: 5042002
   rpc_config:
     url: https://rpc.testnet.arc.network
-  start_block: 0 # To be updated with actual deployment block
+  start_block: 0 
   contracts:
-  - name: EphemeralNotes
-    address: 0xd8D86eCc3d2EFb0939611926c80DC8917440d776
+  - name: FractionalProperty
+    address: 0x149F452265bC3a3958aA505a46B2d2e1bdfBf1D6
     handler: src/EventHandlers.ts
     events:
-    - event: NoteCreated(tuple(address ephemeralOwner, address sender, uint256 amount) note)
-    - event: NoteRedeemed(tuple(address ephemeralOwner, address sender, uint256 amount) note, address redeemer)
+    - event: PropertyListed(uint256 indexed propertyId, uint256 pricePerShare)
+    - event: SharesPurchased(uint256 indexed propertyId, address indexed buyer, uint256 amount)
+  - name: SavingsVault
+    address: 0x0113c0bA806874e409B9dB700563B25cC10167C9
+    handler: src/EventHandlers.ts
+    events:
+    - event: Saved(address indexed user, uint256 indexed propertyId, uint256 amount)
+    - event: Withdrawn(address indexed user, uint256 indexed propertyId, uint256 amount)

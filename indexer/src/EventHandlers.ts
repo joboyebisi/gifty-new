@@ -1,26 +1,44 @@
-// @ts-nocheck
-import { EphemeralNotes } from "generated";
+import { FractionalProperty, SavingsVault } from "generated";
 
-EphemeralNotes.NoteCreated.handler(async ({ event, context }) => {
-    context.Note.set({
-        id: event.params.note.ephemeralOwner,
-        sender: event.params.note.sender,
-        amount: event.params.note.amount,
-        isRedeemed: false,
-        redeemer: null,
-        createdAtTimestamp: event.block.timestamp,
-        redeemedAtTimestamp: null,
-    });
+FractionalProperty.PropertyListed.handler(async ({ event, context }) => {
+    const entity = {
+        id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+        propertyId: event.params.propertyId,
+        pricePerShare: event.params.pricePerShare,
+    };
+
+    context.FractionalProperty_PropertyListed.set(entity);
 });
 
-EphemeralNotes.NoteRedeemed.handler(async ({ event, context }) => {
-    context.Note.set({
-        id: event.params.note.ephemeralOwner,
-        sender: event.params.note.sender,
-        amount: event.params.note.amount,
-        isRedeemed: true,
-        redeemer: event.params.redeemer,
-        createdAtTimestamp: 0, // This will be merged with the existing entity
-        redeemedAtTimestamp: event.block.timestamp,
-    });
+FractionalProperty.SharesPurchased.handler(async ({ event, context }) => {
+    const entity = {
+        id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+        propertyId: event.params.propertyId,
+        buyer: event.params.buyer,
+        amount: event.params.amount,
+    };
+
+    context.FractionalProperty_SharesPurchased.set(entity);
+});
+
+SavingsVault.Saved.handler(async ({ event, context }) => {
+    const entity = {
+        id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+        user: event.params.user,
+        propertyId: event.params.propertyId,
+        amount: event.params.amount,
+    };
+
+    context.SavingsVault_Saved.set(entity);
+});
+
+SavingsVault.Withdrawn.handler(async ({ event, context }) => {
+    const entity = {
+        id: `${event.chainId}_${event.block.number}_${event.logIndex}`,
+        user: event.params.user,
+        propertyId: event.params.propertyId,
+        amount: event.params.amount,
+    };
+
+    context.SavingsVault_Withdrawn.set(entity);
 });

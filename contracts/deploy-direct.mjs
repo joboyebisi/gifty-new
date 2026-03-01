@@ -10,47 +10,56 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function main() {
-    console.log("Compiling EphemeralNotes.sol...");
+function compileContracts() {
+    console.log("Compiling RWA Contracts...");
 
-    const contractPath = path.join(__dirname, 'src', 'EphemeralNotes.sol');
-    const contractSource = fs.readFileSync(contractPath, 'utf8');
+    const fractionalPath = path.join(__dirname, 'src', 'FractionalProperty.sol');
+    const savingsPath = path.join(__dirname, 'src', 'SavingsVault.sol');
 
-    // Configure solc input
+    const fractionalSource = fs.readFileSync(fractionalPath, 'utf8');
+    const savingsSource = fs.readFileSync(savingsPath, 'utf8');
+
     const input = {
         language: 'Solidity',
         sources: {
-            'EphemeralNotes.sol': {
-                content: contractSource,
-            },
+            'FractionalProperty.sol': { content: fractionalSource },
+            'SavingsVault.sol': { content: savingsSource }
         },
         settings: {
             outputSelection: {
                 '*': {
-                    '*': ['abi', 'evm.bytecode'],
-                },
+                    '*': ['abi', 'evm.bytecode']
+                }
             },
             optimizer: {
                 enabled: true,
                 runs: 200
             }
-        },
+        }
     };
 
-    // Import callback for resolving OpenZeppelin contracts
     function findImports(importPath) {
         try {
             if (importPath.startsWith('@openzeppelin')) {
                 const fullPath = path.resolve(__dirname, 'node_modules', importPath);
                 return { contents: fs.readFileSync(fullPath, 'utf8') };
             }
-            // Handle relative imports from within OpenZeppelin (like Ownable importing Context)
+            // Handle common internal OpenZeppelin dependencies:
             if (importPath.includes('Context.sol')) {
-                const fullPath = path.resolve(__dirname, 'node_modules/@openzeppelin/contracts/utils/Context.sol');
-                return { contents: fs.readFileSync(fullPath, 'utf8') };
+                return { contents: fs.readFileSync(path.resolve(__dirname, 'node_modules/@openzeppelin/contracts/utils/Context.sol'), 'utf8') };
+            }
+            if (importPath.includes('IERC20.sol')) {
+                return { contents: fs.readFileSync(path.resolve(__dirname, 'node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol'), 'utf8') };
+            }
+            if (importPath.includes('IERC1155.sol') || importPath.includes('IERC165.sol')) {
+                // Return empty string for simplistic resolution, or recursively build OpenZeppelin's entire tree.
+                // For now, let's just attempt direct read if it falls back here:
+                const prefix = path.resolve(__dirname, 'node_modules');
+                return { contents: fs.readFileSync(path.join(prefix, importPath), 'utf8') }
             }
             return { error: 'File not found' };
         } catch (e) {
+            console.error("Missing import:", importPath)
             return { error: 'File not found: ' + e.message };
         }
     }
@@ -67,38 +76,44 @@ async function main() {
         }
     }
 
-    const contractFile = output.contracts['EphemeralNotes.sol'];
-    const EphemeralNotes = contractFile['EphemeralNotes'];
+    return output.contracts;
+}
 
-    const abi = EphemeralNotes.abi;
-    const bytecode = EphemeralNotes.evm.bytecode.object;
+async function main() {
+    const contracts = compileContracts();
+    console.log("Compilation successful!");
 
-    console.log("Compilation successful! Deploying to Circle Arc... this may take 10-20 seconds.");
+    const FractionalPropertyDef = contracts['FractionalProperty.sol']['FractionalProperty'];
+    const SavingsVaultDef = contracts['SavingsVault.sol']['SavingsVault'];
 
     const provider = new ethers.JsonRpcProvider("https://rpc.testnet.arc.network");
 
     let rawKey = process.env.PRIVATE_KEY || "";
     const hexMatch = rawKey.match(/[a-fA-F0-9]{64}/);
     if (!hexMatch) {
-        console.error("CRITICAL ERROR: No valid 64-character hex private key found in .env.");
-        console.error("Please ensure the PRIVATE_KEY string contains the 64 hexadecimal characters.");
-        process.exit(1);
+        console.error("CRITICAL ERROR: Invalid PRIVATE_KEY"); process.exit(1);
     }
-    rawKey = "0x" + hexMatch[0];
-
-    const wallet = new ethers.Wallet(rawKey, provider);
-
-    const factory = new ethers.ContractFactory(abi, bytecode, wallet);
-
+    const wallet = new ethers.Wallet("0x" + hexMatch[0], provider);
     const arcTestnetUsdc = "0x3600000000000000000000000000000000000000";
 
-    const contract = await factory.deploy(arcTestnetUsdc);
-    await contract.waitForDeployment();
+    console.log(`Deploying from account: ${wallet.address}`);
 
-    const address = await contract.getAddress();
-    console.log("==================================================");
-    console.log("✅ EphemeralNotes deployed successfully to:", address);
-    console.log("==================================================");
+    // 1. Deploy FractionalProperty
+    console.log("Deploying FractionalProperty...");
+    const fracFactory = new ethers.ContractFactory(FractionalPropertyDef.abi, FractionalPropertyDef.evm.bytecode.object, wallet);
+    const fracContract = await fracFactory.deploy(arcTestnetUsdc);
+    await fracContract.waitForDeployment();
+    const fracAddress = await fracContract.getAddress();
+    console.log("✅ FractionalProperty deployed to:", fracAddress);
+
+    // 2. Deploy SavingsVault
+    console.log("Deploying SavingsVault...");
+    const savingsFactory = new ethers.ContractFactory(SavingsVaultDef.abi, SavingsVaultDef.evm.bytecode.object, wallet);
+    const savingsContract = await savingsFactory.deploy(arcTestnetUsdc);
+    await savingsContract.waitForDeployment();
+    const savingsAddress = await savingsContract.getAddress();
+    console.log("✅ SavingsVault deployed to:", savingsAddress);
+
 }
 
 main().catch(console.error);
