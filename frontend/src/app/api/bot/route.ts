@@ -32,6 +32,20 @@ if (token) {
         );
     });
 
+    bot.command('help', async (ctx) => {
+        await ctx.reply(
+            "🤖 *Agentic Real Estate Help Center*\n\n" +
+            "Here is what I can do for you:\n\n" +
+            "🔹 `/start` - Connect your wallet and initialize the AI Agent.\n" +
+            "🔹 `/properties` - Browse all available real-world assets to invest in.\n" +
+            "🔹 `/portfolio` - View your active fractional real estate investments.\n" +
+            "🔹 `/pool` - Start a recurring savings pool with friends for a property.\n" +
+            "🔹 `/help` - Show this message again.\n\n" +
+            "💡 *Pro Tip:* You don't need to use commands! You can just chat with me naturally (e.g., _\"Show me properties in New York\"_ or _\"Invest 500 USDC into the Miami Condo\"_).",
+            { parse_mode: 'Markdown' }
+        );
+    });
+
     bot.command('portfolio', async (ctx) => {
         await ctx.reply("📈 *Your Fractional Real Estate Portfolio*\n\n_(Coming soon! Will fetch your active USDC investments from the Arc blockchain)_", { parse_mode: 'Markdown' });
     });
