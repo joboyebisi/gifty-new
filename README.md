@@ -20,7 +20,7 @@ Gifty is a full-stack Web3 application designed as a monorepo with three extreme
 
 ### 1. 📜 Smart Contracts (`/contracts`)
 - **Framework:** Foundry / Hardhat / solc
-- **Core:** The `EphemeralNotes.sol` escrow contract safely holds pooled USDC until the designated recipient claims it using their ephemeral private key.
+- **Core:** The `FractionalProperty.sol` contract tokenizes RWAs (ERC-1155) and the `SavingsVault.sol` acts as an agent-controlled escrow for recurring USDC investments.
 - **Network:** Deployed purely on the **Circle Arc Testnet**.
 
 ### 2. 📱 Frontend & Telegram Webhook (`/frontend`)
@@ -54,8 +54,12 @@ In the `frontend/` directory, create a `.env` file:
 TELEGRAM_BOT_TOKEN="your_bot_token"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 CIRCLE_ARC_RPC_URL="https://rpc.testnet.arc.network"
+CIRCLE_API_KEY="your_circle_api_key"
 UPSTASH_REDIS_REST_URL="your_upstash_url"
 UPSTASH_REDIS_REST_TOKEN="your_upstash_token"
+NEXT_PUBLIC_SUPABASE_URL="your_supabase_url"
+SUPABASE_SERVICE_ROLE_KEY="your_role_key"
+DEEPSEEK_API_KEY="your_deepseek_key"
 ```
 
 ### 3. Run the Next.js App (UI & Webhook)
@@ -88,7 +92,8 @@ Gifty is structurally optimized for an instant deployment on Vercel. Because the
 ## 🔒 Live Deployments
 **Network:** Circle Arc Testnet
 **USDC Contract:** `0x3600000000000000000000000000000000000000`
-**EphemeralNotes Contract:** `0xd8D86eCc3d2EFb0939611926c80DC8917440d776`
+**FractionalProperty Contract:** `0x149F452265bC3a3958aA505a46B2d2e1bdfBf1D6`
+**SavingsVault Contract:** `0x0113c0bA806874e409B9dB700563B25cC10167C9`
 
 ## 📄 License
 This project is licensed under the MIT License.
