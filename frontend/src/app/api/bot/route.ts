@@ -140,5 +140,20 @@ if (token) {
 }
 
 // Next.js API Route Handlers
-export const POST = bot ? webhookCallback(bot, 'std/http') : async () => new Response("Bot token not configured", { status: 500 });
-export const GET = async () => new Response("Gifty Telegram webhook is alive.");
+export async function POST(req: Request) {
+    if (!bot) {
+        return new Response("Bot token not configured", { status: 500 });
+    }
+    try {
+        const update = await req.json();
+        await bot.handleUpdate(update);
+        return new Response("OK", { status: 200 });
+    } catch (err) {
+        console.error("Error handling update:", err);
+        return new Response("Error", { status: 500 });
+    }
+}
+
+export async function GET() {
+    return new Response("Gifty Telegram webhook is alive.", { status: 200 });
+}
